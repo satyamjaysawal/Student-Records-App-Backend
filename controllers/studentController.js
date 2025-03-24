@@ -49,7 +49,7 @@ exports.deleteStudent = async (req, res) => {
 exports.getMarks = async (req, res) => {
   try {
     const { rows } = await db.query(`
-      SELECT s.id AS student_id, s.name, m.semester_id, m.subject_name, m.marks_obtained, m.total_marks
+      SELECT s.id AS student_id, s.name, m.id AS mark_id, m.semester_id, m.subject_name, m.marks_obtained, m.total_marks
       FROM students s
       LEFT JOIN marks m ON s.id = m.student_id
     `);
@@ -68,6 +68,17 @@ exports.addMark = async (req, res) => {
     res.status(201).json({ message: 'Mark added' });
   } catch (err) {
     console.error('Add mark error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+exports.deleteMark = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query('DELETE FROM marks WHERE id = $1', [id]);
+    res.json({ message: 'Mark deleted' });
+  } catch (err) {
+    console.error('Delete mark error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
